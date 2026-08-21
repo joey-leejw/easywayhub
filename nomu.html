@@ -154,6 +154,9 @@ input[readonly]{background:var(--auto);color:#333;font-weight:700}
 .dedhead{background:#fbeaea!important;color:#a01d1d}
 .totrow td{background:#f1f1f1;font-weight:800}
 .netrow td{background:#eef8f1;font-weight:800;font-size:13px;color:#0f7a3d}
+.noworker{background:#fdf6e8;border:1px solid #f0dcb0;color:#8a6100;
+  padding:8px 11px;border-radius:6px;font-size:10.2px;margin-bottom:11px;text-align:center}
+@media print{.noworker{display:none}}
 .foot-note{font-size:9.3px;color:#444;margin-top:10px;border-top:1px solid #999;padding-top:6px;line-height:1.5}
 .docsign{margin-top:22px;text-align:right;font-size:11px}
 
@@ -202,7 +205,7 @@ input[readonly]{background:var(--auto);color:#333;font-weight:700}
       </div>
       <label class="f"><span>소재지</span><input id="coAddr" type="text" value="광주광역시 서구 하남대로550번길 19-5(동천동)"></label>
       <label class="f"><span>연락처</span><input id="coTel" type="text" value="070-4858-5098"></label>
-      <button class="minibtn" onclick="saveCompany()">🏢 회사 정보 기억하기</button>
+      <button class="minibtn" onclick="saveCompany()">회사 정보 기억하기</button>
     </div>
 
     <div class="sec">
@@ -310,14 +313,14 @@ input[readonly]{background:var(--auto);color:#333;font-weight:700}
 
     <div class="sec">
       <h2><span class="n">7</span>근로자 저장</h2>
-      <button class="minibtn solid" onclick="saveWorker()">💾 이 근로자 저장하기</button>
+      <button class="minibtn solid" onclick="saveWorker()">이 근로자 저장하기</button>
       <div id="loadedInfo" class="loaded"></div>
-      <button class="minibtn" onclick="openLoad(1)">📂 저장한 근로자 불러오기</button>
+      <button class="minibtn" onclick="openLoad(1)">저장한 근로자 불러오기</button>
       <div class="hint">저장하면 <b>임금명세서 탭에서 바로 불러올 수 있습니다.</b> 데이터는 이 브라우저에만 저장됩니다.</div>
     </div>
 
     <div class="foot">
-      <button class="btn print" onclick="window.print()">🖨️ 인쇄 / PDF</button>
+      <button class="btn print" onclick="window.print()">인쇄 / PDF</button>
       <button class="btn ghost" onclick="resetC()">초기화</button>
     </div>
   </div>
@@ -330,7 +333,7 @@ input[readonly]{background:var(--auto);color:#333;font-weight:700}
 
     <div class="sec">
       <h2><span class="n">1</span>근로자 · 귀속월</h2>
-      <button class="minibtn solid" onclick="openLoad(2)">📂 근로계약서에서 근로자 불러오기</button>
+      <button class="minibtn solid" onclick="openLoad(2)">근로계약서에서 근로자 불러오기</button>
       <div id="ps_loaded" class="loaded"></div>
       <div class="row" style="margin-top:11px">
         <label class="f"><span>귀속 연월</span><input id="ps_ym" type="month"></label>
@@ -411,7 +414,7 @@ input[readonly]{background:var(--auto);color:#333;font-weight:700}
     </div>
 
     <div class="foot">
-      <button class="btn print" onclick="window.print()">🖨️ 인쇄 / PDF</button>
+      <button class="btn print" onclick="window.print()">인쇄 / PDF</button>
       <button class="btn ghost" onclick="resetP()">초기화</button>
     </div>
   </div>
@@ -482,7 +485,7 @@ function openLoad(target){
   $('loadTitle').textContent = target===1?'저장한 근로자 — 불러오기':'근로계약서에 저장된 근로자';
   const list=fetchStore(KEY_W,[]), box=$('loadList');
   box.innerHTML=!list.length
-    ? '<div class="empty">저장된 근로자가 없습니다.<br>근로계약서 탭에서 먼저<br>“💾 이 근로자 저장하기”를 눌러 주세요.</div>'
+    ? '<div class="empty">저장된 근로자가 없습니다.<br>근로계약서 탭에서 먼저<br>“이 근로자 저장하기”를 눌러 주세요.</div>'
     : list.slice().reverse().map(w=>`<div class="wrow" onclick="applyWorker('${w.id}')">
         <div><div class="nm">${w.name}</div><div class="sub">${w.id} · 입사 ${w.startDate||'-'} · 저장 ${w.savedAt}</div></div>
         ${target===1?`<button class="del" onclick="event.stopPropagation();delWorker('${w.id}')">삭제</button>`
@@ -535,8 +538,8 @@ function renderTime(t){
     <div class="line"><span>월 실연장 합계</span><b>${t.monthOt.toFixed(2)} h</b></div>
     <div class="line"><span>법정 필요 할증시간 (×1.5)</span><b>${t.legalOtHours.toFixed(2)} h</b></div>
     <div class="sub">주 평균 실근로 ${t.weekAvg.toFixed(1)}시간 · 주 연장 ${(t.monthOt/WEEKS).toFixed(1)}시간</div>
-    ${t.weekAvg>52?`<div class="flag err">⚠️ 주 평균 ${t.weekAvg.toFixed(1)}시간 — 주 52시간 한도 초과</div>`:''}
-    ${(t.monthOt/WEEKS)>12?`<div class="flag err">⚠️ 주 연장 ${(t.monthOt/WEEKS).toFixed(1)}시간 — 12시간 한도 초과</div>`:''}`;
+    ${t.weekAvg>52?`<div class="flag err">[주의] 주 평균 ${t.weekAvg.toFixed(1)}시간 — 주 52시간 한도 초과</div>`:''}
+    ${(t.monthOt/WEEKS)>12?`<div class="flag err">[주의] 주 연장 ${(t.monthOt/WEEKS).toFixed(1)}시간 — 12시간 한도 초과</div>`:''}`;
 }
 
 let designMode='total';
@@ -584,19 +587,19 @@ function renderWage(t,w){
     <div class="sub">과세 대상 ${won(w.total-w.nonTax)}원 — 4대보험·소득세는 이 금액 기준</div>`;
 
   h += w.hourly < w.minWage-0.5
-    ? `<div class="flag err">⚠️ 최저임금 위반 — 통상시급 ${won(w.hourly)}원 &lt; ${won(w.minWage)}원</div>`
-    : `<div class="flag ok">✓ 최저임금 충족 — 기본급·식대·차량유지비 모두 산입 항목입니다.</div>`;
+    ? `<div class="flag err">[주의] 최저임금 위반 — 통상시급 ${won(w.hourly)}원 &lt; ${won(w.minWage)}원</div>`
+    : `<div class="flag ok">· 최저임금 충족 — 기본급·식대·차량유지비 모두 산입 항목입니다.</div>`;
 
   if(t.legalOtHours>0){
     const diff=w.otPay-w.legalOtPay;
     h += diff>=-1
-      ? `<div class="flag ok">✓ 연장수당 적법 — 지급 ${w.revHours.toFixed(2)}h ≥ 법정 ${t.legalOtHours.toFixed(2)}h${diff>1?` (여유 ${won(diff)}원)`:''}</div>`
-      : `<div class="flag err">⚠️ 연장수당 ${won(-diff)}원 부족 — 총액을 <b>${won(w.ordinary+w.legalOtPay)}원</b> 이상으로 올려주세요.</div>`;
+      ? `<div class="flag ok">· 연장수당 적법 — 지급 ${w.revHours.toFixed(2)}h ≥ 법정 ${t.legalOtHours.toFixed(2)}h${diff>1?` (여유 ${won(diff)}원)`:''}</div>`
+      : `<div class="flag err">[주의] 연장수당 ${won(-diff)}원 부족 — 총액을 <b>${won(w.ordinary+w.legalOtPay)}원</b> 이상으로 올려주세요.</div>`;
   }
-  if(w.overflow) h+=`<div class="flag err">⚠️ 식대+차량유지비가 목표 통상임금을 초과해 기본급이 0원이 되었습니다.</div>`;
+  if(w.overflow) h+=`<div class="flag err">[주의] 식대+차량유지비가 목표 통상임금을 초과해 기본급이 0원이 되었습니다.</div>`;
   const pp=num('probPct');
   if(pp<100 && w.hourly*pp/100 < w.minWage*0.9)
-    h+=`<div class="flag err">⚠️ 수습 시급이 최저임금의 90%(${won(w.minWage*0.9)}원)에 미달합니다.</div>`;
+    h+=`<div class="flag err">[주의] 수습 시급이 최저임금의 90%(${won(w.minWage*0.9)}원)에 미달합니다.</div>`;
   if(w.meal>200000) h+=`<div class="flag warn">식대 20만원 초과분 ${won(w.meal-200000)}원은 과세됩니다.</div>`;
   if(w.car>200000)  h+=`<div class="flag warn">차량유지비 20만원 초과분 ${won(w.car-200000)}원은 과세됩니다.</div>`;
   $('wageBox').innerHTML=h;
@@ -795,10 +798,11 @@ function renderDoc2(c){
   $('doc2').innerHTML=`
   <div class="title">임 금 명 세 서</div>
   <div class="subtitle">${ymTxt} 귀속 · 지급일 ${fd(val('ps_payDate'))}</div>
+  ${!val('ps_name')?`<div class="noworker">근로자가 선택되지 않았습니다. 왼쪽 <b>&ldquo;근로계약서에서 근로자 불러오기&rdquo;</b>를 누르거나 성명을 직접 입력하세요.</div>`:''}
   <table>
-    <tr><td class="lbl">회 사 명</td><td>${val('ps_co')||'-'}</td><td class="lbl">성　　명</td><td>${val('ps_name')||'-'}</td></tr>
-    <tr><td class="lbl">부　　서</td><td>${val('ps_dept')||'-'}</td><td class="lbl">사원번호</td><td>${val('ps_no')||'-'}</td></tr>
-    <tr><td class="lbl">직　　급</td><td>${val('ps_rank')||'-'}</td><td class="lbl">입 사 일</td><td>${fd(val('ps_join'))}</td></tr>
+    <tr><td class="lbl">회 사 명</td><td>${blank(val('ps_co'),'회사명')}</td><td class="lbl">성　　명</td><td>${blank(val('ps_name'),'근로자 성명')}</td></tr>
+    <tr><td class="lbl">부　　서</td><td>${blank(val('ps_dept'),'부서')}</td><td class="lbl">사원번호</td><td>${blank(val('ps_no'),'사원번호')}</td></tr>
+    <tr><td class="lbl">직　　급</td><td>${blank(val('ps_rank'),'직급')}</td><td class="lbl">입 사 일</td><td>${val('ps_join')?fd(val('ps_join')):'<span style=\'color:#999\'>입사일</span>'}</td></tr>
   </table>
   <table>
     <tr><th colspan="4">근 로 시 간</th></tr>
