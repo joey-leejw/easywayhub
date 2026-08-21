@@ -55,10 +55,11 @@ input[readonly]{background:var(--auto);color:#333;font-weight:700}
 .minibtn{width:100%;padding:9px;border:1px solid var(--line);border-radius:7px;background:#fff;font-size:12.5px;font-weight:700;cursor:pointer;margin-top:4px}
 #v1 .minibtn{color:var(--blue)} #v1 .minibtn:hover{background:var(--bluesoft);border-color:var(--blue2)}
 #v2 .minibtn{color:var(--green)} #v2 .minibtn:hover{background:var(--greensoft);border-color:var(--green2)}
-.minibtn.solid{color:#fff;font-size:13.5px;padding:11px}
-#v1 .minibtn.solid{background:var(--green);border-color:var(--green)}
-#v2 .minibtn.solid{background:var(--green);border-color:var(--green)}
-.minibtn.solid:hover{background:#0b5f2f}
+#v1 .minibtn.solid,#v2 .minibtn.solid{
+  color:#fff!important;font-size:13.5px;padding:11px;
+  background:var(--green);border-color:var(--green);
+}
+#v1 .minibtn.solid:hover,#v2 .minibtn.solid:hover{background:#0b5f2f;border-color:#0b5f2f}
 
 /* 급여 구성표 */
 .paytbl{border:1px solid var(--line);border-radius:9px;overflow:hidden}
