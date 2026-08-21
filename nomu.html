@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>노무 관리 프로그램 — EASYWAYHUB</title>
+<style>
+:root{--line:#dde1e7;--ink:#16191d;--muted:#6b7280;--blue:#1e4b8f;--blue2:#3a72c4;--bluesoft:#eef3fa;
+--green:#0f7a3d;--green2:#2f9e5f;--greensoft:#eef8f1;--bg:#eff1f4;--card:#fff;--ok:#0f7a3d;--warn:#b45309;--err:#c62828;--auto:#f3f6fa}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:"Malgun Gothic","맑은 고딕",-apple-system,"Apple SD Gothic Neo",sans-serif;color:var(--ink);background:var(--bg);font-size:14px;line-height:1.55;display:flex;flex-direction:column}
+button{font-family:inherit}
+a{color:inherit;text-decoration:none}
+
+/* ── 헤더 ── */
+.topbar{display:flex;align-items:center;gap:20px;background:#16233a;color:#fff;padding:0 20px;flex:none;height:52px}
+.brand{display:flex;align-items:center;gap:9px;font-weight:800;font-size:14px;letter-spacing:.3px;flex:none}
+.brand .dot{width:8px;height:8px;border-radius:50%;background:#e8873a}
+.brand small{font-weight:400;opacity:.6;font-size:11.5px;margin-left:3px}
+.tabs{display:flex;gap:4px;height:100%;flex:1}
+.tabs button{background:transparent;border:none;color:rgba(255,255,255,.62);padding:0 16px;font-size:13px;font-weight:700;cursor:pointer;border-bottom:3px solid transparent;height:100%}
+.tabs button:hover{color:#fff}
+.tabs button.on{color:#fff;border-bottom-color:#e8873a}
+.tabs button .n{opacity:.5;font-size:11px;margin-right:5px}
+.homelink{font-size:11.5px;opacity:.55;flex:none}
+.homelink:hover{opacity:1}
+@media(max-width:760px){.topbar{padding:0 12px;gap:10px}.brand small,.homelink{display:none}.tabs button{padding:0 10px;font-size:12px}}
+
+/* ── 레이아웃 ── */
+.view{display:none;flex:1;min-height:0}
+.view.on{display:flex}
+.panel{width:428px;min-width:428px;background:var(--card);border-right:1px solid var(--line);overflow-y:auto;padding-bottom:76px}
+.preview-wrap{flex:1;overflow-y:auto;padding:24px;background:#e4e7ec;display:flex;justify-content:center;align-items:flex-start}
+.sec{padding:15px 19px;border-bottom:1px solid var(--line)}
+.sec h2{font-size:12.5px;font-weight:800;display:flex;align-items:center;gap:7px;margin-bottom:12px}
+.sec h2 .n{color:#fff;width:19px;height:19px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:10.5px;flex:none}
+#v1 .sec h2{color:var(--blue)} #v1 .sec h2 .n{background:var(--blue)}
+#v2 .sec h2{color:var(--green)} #v2 .sec h2 .n{background:var(--green)}
+.row{display:flex;gap:8px}
+.row>*{flex:1;min-width:0}
+label.f{display:block;margin-bottom:9px}
+label.f>span{display:block;font-size:11.5px;color:var(--muted);margin-bottom:3px;font-weight:600}
+input[type=text],input[type=number],input[type=date],input[type=email],input[type=month],select{width:100%;padding:8px 9px;border:1px solid var(--line);border-radius:7px;font-size:13px;font-family:inherit;background:#fff;color:var(--ink)}
+input:focus,select:focus{outline:none;border-color:var(--blue2);box-shadow:0 0 0 3px rgba(58,114,196,.13)}
+#v2 input:focus,#v2 select:focus{border-color:var(--green2);box-shadow:0 0 0 3px rgba(47,158,95,.14)}
+input[readonly]{background:var(--auto);color:#333;font-weight:700}
+.hint{font-size:11px;color:var(--muted);margin-top:4px;line-height:1.45}
+.hint.note{background:#fdf6e8;border:1px solid #f0dcb0;color:#8a6100;padding:7px 9px;border-radius:6px}
+.cat{font-size:11px;font-weight:800;color:var(--muted);margin:14px 0 6px}
+.seg{display:flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;margin-bottom:10px}
+.seg button{flex:1;border:none;background:#fff;padding:8px 4px;font-size:12px;font-weight:700;cursor:pointer;color:var(--muted)}
+#v1 .seg button.on{background:var(--blue);color:#fff}
+#v2 .seg button.on{background:var(--green);color:#fff}
+.minibtn{width:100%;padding:9px;border:1px solid var(--line);border-radius:7px;background:#fff;font-size:12.5px;font-weight:700;cursor:pointer;margin-top:4px}
+#v1 .minibtn{color:var(--blue)} #v1 .minibtn:hover{background:var(--bluesoft);border-color:var(--blue2)}
+#v2 .minibtn{color:var(--green)} #v2 .minibtn:hover{background:var(--greensoft);border-color:var(--green2)}
+.minibtn.solid{color:#fff;font-size:13.5px;padding:11px}
+#v1 .minibtn.solid{background:var(--green);border-color:var(--green)}
+#v2 .minibtn.solid{background:var(--green);border-color:var(--green)}
+.minibtn.solid:hover{background:#0b5f2f}
+
+/* 급여 구성표 */
+.paytbl{border:1px solid var(--line);border-radius:9px;overflow:hidden}
+.pr{display:grid;grid-template-columns:1fr 120px 40px;align-items:center;border-bottom:1px solid var(--line)}
+.pr:last-child{border-bottom:none}
+.pr>.lb{padding:9px 11px;font-size:12.5px;font-weight:600}
+.pr>.lb small{display:block;font-size:10px;color:var(--muted);font-weight:400;margin-top:1px}
+.pr>input{border:none;border-radius:0;padding:9px 10px;text-align:right;font-size:13px;font-variant-numeric:tabular-nums}
+.pr>input:focus{box-shadow:inset 0 0 0 2px var(--blue2)}
+.pr>.tag{font-size:9.5px;text-align:center;color:var(--muted);font-weight:700}
+.pr.auto{background:var(--auto)}
+.pr.auto>.tag{color:var(--blue)}
+.pr.sum{background:#e6ecf5}
+.pr.sum>.lb{color:var(--blue);font-weight:800}
+.pr.sum>.v{padding:9px 10px;text-align:right;font-size:13.5px;font-weight:800;color:var(--blue);font-variant-numeric:tabular-nums}
+.pr.total{background:var(--blue);color:#fff}
+.pr.total>.lb{color:#fff;font-weight:800}
+.pr.total>.v{padding:11px 10px;text-align:right;font-size:15px;font-weight:800;color:#fff;font-variant-numeric:tabular-nums}
+.pr.total>.tag{color:rgba(255,255,255,.65)}
+.g3{display:grid;grid-template-columns:1fr 104px 92px;gap:6px;align-items:center;margin-bottom:6px}
+.g3h{display:grid;grid-template-columns:1fr 104px 92px;gap:6px;font-size:10px;color:var(--muted);font-weight:700;margin-bottom:4px;text-align:center}
+.g3h span:first-child{text-align:left}
+.g2{display:grid;grid-template-columns:1fr 104px;gap:6px;align-items:center;margin-bottom:6px}
+.g3 .lb,.g2 .lb{font-size:12px;font-weight:600}
+.g3 .lb small,.g2 .lb small{display:block;font-size:10px;color:var(--muted);font-weight:400}
+.g3 input,.g2 input{padding:6px 7px;font-size:12.5px;text-align:right}
+.g3 .nt{background:#f0f9f3}
+
+.calcbox{border-radius:9px;padding:12px;margin-top:8px}
+#v1 .calcbox{background:var(--bluesoft);border:1px solid #d3e0f0}
+#v2 .calcbox{background:var(--greensoft);border:1px solid #cbe6d6}
+.calcbox .line{display:flex;justify-content:space-between;gap:8px;padding:4px 0;font-size:12.5px;border-bottom:1px dashed #cbd8e8}
+#v2 .calcbox .line{border-bottom-color:#c3ddce}
+.calcbox .line:last-child{border-bottom:none}
+.calcbox .line b{font-variant-numeric:tabular-nums}
+#v1 .calcbox .line b{color:var(--blue)}
+.calcbox .big{font-size:15px;font-weight:800;margin-top:5px;padding-top:7px}
+#v1 .calcbox .big{color:var(--blue);border-top:2px solid var(--blue)}
+#v2 .calcbox .big{color:var(--green);border-top:2px solid var(--green)}
+#v2 .calcbox .big b{color:var(--green)}
+.calcbox .sub{font-size:11px;color:var(--muted);padding:2px 0}
+.flag{font-size:11.5px;padding:7px 9px;border-radius:6px;margin-top:8px;line-height:1.45}
+.flag.ok{background:#e6f5ec;color:var(--ok)}
+.flag.warn{background:#fdf1e2;color:var(--warn)}
+.flag.err{background:#fdecec;color:var(--err)}
+.loaded{display:none;margin-top:7px;padding:8px 10px;border-radius:7px;font-size:12px}
+#v1 .loaded{background:var(--bluesoft);border:1px solid #cfdcee;color:var(--blue)}
+#v2 .loaded{background:var(--greensoft);border:1px solid #cbe6d6;color:var(--green)}
+
+.foot{position:fixed;bottom:0;left:0;width:428px;background:#fff;border-top:1px solid var(--line);padding:10px 15px;display:flex;gap:7px;z-index:6}
+.btn{flex:1;padding:11px;border:none;border-radius:8px;font-weight:800;font-size:13px;cursor:pointer;color:#fff}
+#v1 .btn.print{background:var(--blue)} #v2 .btn.print{background:var(--green)}
+.btn.ghost{background:#eceff3;color:var(--ink);flex:0 0 auto;padding:11px 14px}
+
+.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:50;align-items:center;justify-content:center;padding:16px}
+.modal.on{display:flex}
+.modalbox{background:#fff;border-radius:13px;width:100%;max-width:460px;max-height:78vh;display:flex;flex-direction:column;box-shadow:0 18px 50px rgba(0,0,0,.3)}
+.modalbox .mh{padding:15px 18px;border-bottom:1px solid var(--line);font-weight:800;font-size:14px;color:var(--blue)}
+.modalbox .mb{overflow-y:auto;padding:8px 12px;flex:1}
+.modalbox .mf{padding:12px 18px;border-top:1px solid var(--line);text-align:right}
+.wrow{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:11px 10px;border-radius:8px;cursor:pointer;border:1px solid transparent}
+.wrow:hover{background:var(--bluesoft);border-color:#cfdcee}
+.wrow .nm{font-weight:700;font-size:13.5px}
+.wrow .sub{font-size:11px;color:var(--muted);margin-top:1px}
+.wrow .del{border:none;background:#fdecec;color:var(--err);border-radius:6px;padding:5px 9px;font-size:11px;font-weight:700;cursor:pointer;flex:none}
+.empty{text-align:center;color:var(--muted);font-size:12.5px;padding:26px 10px;line-height:1.6}
+
+/* ── 문서 ── */
+.sheet{background:#fff;width:210mm;min-height:297mm;box-shadow:0 4px 22px rgba(0,0,0,.13);color:#000}
+#doc1{padding:13mm 12mm;font-size:10.8px;line-height:1.58}
+#doc2{padding:15mm 14mm;font-size:11px;line-height:1.6}
+.doc .title{text-align:center;font-weight:800;margin:0 0 4px}
+#doc1 .title{font-size:19px;letter-spacing:8px;padding-left:8px}
+#doc2 .title{font-size:21px;letter-spacing:10px;padding-left:10px}
+.doc .topsign{text-align:right;font-size:9.5px;margin-bottom:9px;border-bottom:1px solid #999;padding-bottom:4px}
+.doc .subtitle{text-align:center;font-size:10px;color:#555;margin-bottom:14px;letter-spacing:1px}
+.doc table{width:100%;border-collapse:collapse;margin:0 0 9px}
+.doc td,.doc th{border:1px solid #000;padding:3.5px 5px;vertical-align:middle}
+.doc th{background:#f1f1f1;font-weight:700;text-align:center;font-size:10.5px}
+.doc .lbl{background:#f1f1f1;font-weight:700;text-align:center;white-space:nowrap}
+.doc .num{text-align:right;font-variant-numeric:tabular-nums}
+.doc .calcnote{font-size:9.2px;color:#444;line-height:1.4}
+.artH{font-weight:800;margin:9px 0 2px}
+.artP{margin:1.5px 0 1.5px 9px;text-indent:-9px}
+.wagebox td{font-size:10.3px;padding:3px 5px}
+.datestr{text-align:center;font-weight:700;margin:20px 0 10px;letter-spacing:3px}
+.sign-row{display:flex;justify-content:space-between;gap:24px}
+.sign-box{flex:1}
+.sign-line{display:flex;align-items:flex-end;gap:6px;margin-bottom:6px}
+.sign-line .k{white-space:nowrap;font-size:10.3px;font-weight:700}
+.sign-line .v{border-bottom:1px solid #000;flex:1;padding:0 4px 1px;min-height:18px;font-size:10.5px}
+.payhead{background:#e8eef7!important;color:#1e4b8f}
+.dedhead{background:#fbeaea!important;color:#a01d1d}
+.totrow td{background:#f1f1f1;font-weight:800}
+.netrow td{background:#eef8f1;font-weight:800;font-size:13px;color:#0f7a3d}
+.foot-note{font-size:9.3px;color:#444;margin-top:10px;border-top:1px solid #999;padding-top:6px;line-height:1.5}
+.docsign{margin-top:22px;text-align:right;font-size:11px}
+
+@media(max-width:1000px){
+  html,body{height:auto}
+  .view.on{flex-direction:column}
+  .panel{width:100%;min-width:0;padding-bottom:20px}
+  .foot{width:100%}
+  .preview-wrap{padding:12px}
+  .sheet{width:100%;min-height:auto}
+  #doc1,#doc2{padding:8mm 6mm}
+  .sign-row{flex-direction:column;gap:18px}
+}
+@media print{
+  body{background:#fff;display:block}
+  .topbar,.panel,.foot,.modal{display:none!important}
+  .view{display:none!important}
+  .view.on{display:block!important}
+  .preview-wrap{overflow:visible;padding:0;background:#fff;display:block}
+  .sheet{box-shadow:none;width:auto;min-height:auto}
+  #doc1{padding:0} #doc2{padding:0}
+  @page{size:A4;margin:14mm 13mm}
+}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand"><span class="dot"></span>EASYWAYHUB<small>노무</small></div>
+  <div class="tabs">
+    <button id="t1" class="on" onclick="showView(1)"><span class="n">01</span>근로계약서</button>
+    <button id="t2" onclick="showView(2)"><span class="n">02</span>임금명세서</button>
+  </div>
+  <a class="homelink" href="/">← 허브로</a>
+</header>
+
+<!-- ══════════════ 01 근로계약서 ══════════════ -->
+<div class="view on" id="v1">
+  <div class="panel">
+
+    <div class="sec">
+      <h2><span class="n">1</span>사용자(회사) 정보</h2>
+      <div class="row">
+        <label class="f"><span>사업체명</span><input id="coName" type="text" value="주식회사 이지웨이"></label>
+        <label class="f"><span>대표자</span><input id="coCeo" type="text" value="이 지 웅"></label>
+      </div>
+      <label class="f"><span>소재지</span><input id="coAddr" type="text" value="광주광역시 서구 하남대로550번길 19-5(동천동)"></label>
+      <label class="f"><span>연락처</span><input id="coTel" type="text" value="070-4858-5098"></label>
+      <button class="minibtn" onclick="saveCompany()">🏢 회사 정보 기억하기</button>
+    </div>
+
+    <div class="sec">
+      <h2><span class="n">2</span>근로자 정보</h2>
+      <div class="row">
+        <label class="f"><span>성명</span><input id="empName" type="text" placeholder="홍길동"></label>
+        <label class="f"><span>생년월일 / 주민번호</span><input id="empRrn" type="text" placeholder="960629-2******"></label>
+      </div>
+      <div class="hint note">주민등록번호는 <b>인쇄용으로만 쓰이고 저장되지 않습니다.</b></div>
+      <label class="f" style="margin-top:9px"><span>주소</span><input id="empAddr" type="text" placeholder="근로자 주소"></label>
+      <div class="row">
+        <label class="f"><span>연락처</span><input id="empTel" type="text" placeholder="010-0000-0000"></label>
+        <label class="f"><span>이메일</span><input id="empEmail" type="email" placeholder="employee@email.com"></label>
+      </div>
+      <div class="row">
+        <label class="f"><span>공제대상 가족수</span><input id="empFamily" type="number" min="1" value="1"></label>
+        <label class="f"><span>8~20세 자녀수</span><input id="empChildren" type="number" min="0" value="0"></label>
+      </div>
+      <div class="hint">임금명세서의 소득세 계산에 사용됩니다.</div>
+      <label class="f" style="margin-top:9px"><span>담당업무</span><input id="empJob" type="text" value="매장 관리"></label>
+      <label class="f"><span>취업장소</span><input id="empPlace" type="text" value="사업장 또는 사업장의 업무상 필요에 의해 지정한 장소"></label>
+    </div>
+
+    <div class="sec">
+      <h2><span class="n">3</span>계약 조건</h2>
+      <div class="row">
+        <label class="f"><span>입사일</span><input id="startDate" type="date"></label>
+        <label class="f"><span>계약 형태</span>
+          <select id="contractType"><option value="fixed">계약직</option><option value="none">정규직</option></select>
+        </label>
+      </div>
+      <div class="row" id="endWrap">
+        <label class="f"><span>계약 종료일</span><input id="endDate" type="date"></label>
+        <label class="f"><span>계약기간</span><input id="termLabel" type="text" value="1년" readonly></label>
+      </div>
+      <div class="row">
+        <label class="f"><span>수습기간(개월)</span><input id="probMonth" type="number" value="3" min="0" max="12"></label>
+        <label class="f"><span>수습 급여(%)</span><input id="probPct" type="number" value="100" min="70" max="100"></label>
+      </div>
+      <label class="f"><span>계약 체결일</span><input id="signDate" type="date"></label>
+    </div>
+
+    <div class="sec">
+      <h2><span class="n">4</span>근무시간</h2>
+      <div class="cat">평일 (월~금)</div>
+      <div class="row">
+        <label class="f"><span>출근</span><input id="wdStart" type="text" value="08:00"></label>
+        <label class="f"><span>퇴근</span><input id="wdEnd" type="text" value="17:30"></label>
+        <label class="f"><span>휴게(분)</span><input id="wdRest" type="number" value="60" step="30"></label>
+        <label class="f"><span>일수</span><input id="wdDays" type="number" value="5" min="1" max="6"></label>
+      </div>
+      <div class="cat">토요일</div>
+      <label class="f"><span>근무 빈도</span>
+        <select id="satFreq">
+          <option value="0">근무 없음</option>
+          <option value="2.1726" selected>격주 (월 2.17회)</option>
+          <option value="4.345">매주 (월 4.35회)</option>
+          <option value="1">월 1회</option>
+        </select>
+      </label>
+      <div class="row" id="satWrap">
+        <label class="f"><span>출근</span><input id="satStart" type="text" value="08:00"></label>
+        <label class="f"><span>퇴근</span><input id="satEnd" type="text" value="15:00"></label>
+        <label class="f"><span>휴게(분)</span><input id="satRest" type="number" value="60" step="30"></label>
+      </div>
+      <label class="f" style="margin-top:9px"><span>주휴일</span><input id="weeklyOff" type="text" value="일요일"></label>
+      <div class="calcbox" id="timeBox"></div>
+    </div>
+
+    <div class="sec">
+      <h2><span class="n">5</span>임금 설계</h2>
+      <div class="row">
+        <label class="f"><span>적용 최저시급 (원)</span><input id="minWage" type="number" value="10320" step="10"></label>
+        <label class="f"><span>통상시급 여유율</span>
+          <select id="buffer"><option value="0" selected>0% (최저시급)</option><option value="1">+1%</option><option value="2">+2%</option><option value="3">+3%</option></select>
+        </label>
+      </div>
+      <div class="cat">설계 방식</div>
+      <div class="seg" id="designMode">
+        <button data-d="total" class="on">총액 배분형</button>
+        <button data-d="minimum">법정 최소형</button>
+      </div>
+      <label class="f" id="dm_total"><span>월 급여 총액 (세전, 원)</span><input id="targetTotal" type="number" value="2650000" step="10000"></label>
+      <div class="hint" id="modeHint">총액을 넣으면 통상임금을 최저시급에 맞추고, <b>나머지 전액을 약정연장수당</b>으로 배분합니다.</div>
+
+      <div class="cat">급여 구성 <span style="font-weight:400;color:#999">— 식대·차량유지비만 입력</span></div>
+      <div class="paytbl">
+        <div class="pr auto"><div class="lb">기본급 <small>주휴 포함 · 최저임금 산입</small></div><input id="p_base" type="number" readonly><div class="tag">자동</div></div>
+        <div class="pr"><div class="lb">식대 <small>비과세 20만 · 최저임금 산입</small></div><input id="p_meal" type="number" value="200000" step="10000"><div class="tag">입력</div></div>
+        <div class="pr"><div class="lb">차량유지비 <small>비과세 20만 · 최저임금 산입</small></div><input id="p_car" type="number" value="200000" step="10000"><div class="tag">입력</div></div>
+        <div class="pr sum"><div class="lb">통상임금 소계</div><div class="v" id="v_ord">-</div><div class="tag">＝</div></div>
+        <div class="pr auto"><div class="lb">약정 연장수당 <small id="lb_ot">최저임금 산입 안 됨</small></div><input id="p_ot" type="number" readonly><div class="tag">자동</div></div>
+        <div class="pr total"><div class="lb">월 급여 총액</div><div class="v" id="v_total">-</div><div class="tag">＝</div></div>
+      </div>
+      <div class="calcbox" id="wageBox"></div>
+    </div>
+
+    <div class="sec">
+      <h2><span class="n">6</span>지급 조건</h2>
+      <div class="row">
+        <label class="f"><span>정산 기간</span><input id="payTerm" type="text" value="당월 1일 ~ 당월 말일"></label>
+        <label class="f"><span>지급일</span><input id="payDay" type="text" value="익월 10일"></label>
+      </div>
+    </div>
+
+    <div class="sec">
+      <h2><span class="n">7</span>근로자 저장</h2>
+      <button class="minibtn solid" onclick="saveWorker()">💾 이 근로자 저장하기</button>
+      <div id="loadedInfo" class="loaded"></div>
+      <button class="minibtn" onclick="openLoad(1)">📂 저장한 근로자 불러오기</button>
+      <div class="hint">저장하면 <b>임금명세서 탭에서 바로 불러올 수 있습니다.</b> 데이터는 이 브라우저에만 저장됩니다.</div>
+    </div>
+
+    <div class="foot">
+      <button class="btn print" onclick="window.print()">🖨️ 인쇄 / PDF</button>
+      <button class="btn ghost" onclick="resetC()">초기화</button>
+    </div>
+  </div>
+  <div class="preview-wrap"><div class="sheet doc" id="doc1"></div></div>
+</div>
+
+<!-- ══════════════ 02 임금명세서 ══════════════ -->
+<div class="view" id="v2">
+  <div class="panel">
+
+    <div class="sec">
+      <h2><span class="n">1</span>근로자 · 귀속월</h2>
+      <button class="minibtn solid" onclick="openLoad(2)">📂 근로계약서에서 근로자 불러오기</button>
+      <div id="ps_loaded" class="loaded"></div>
+      <div class="row" style="margin-top:11px">
+        <label class="f"><span>귀속 연월</span><input id="ps_ym" type="month"></label>
+        <label class="f"><span>지급일</span><input id="ps_payDate" type="date"></label>
+      </div>
+      <div class="row">
+        <label class="f"><span>성명</span><input id="ps_name" type="text" placeholder="홍길동"></label>
+        <label class="f"><span>사원번호</span><input id="ps_no" type="text" placeholder="WK-..."></label>
+      </div>
+      <div class="row">
+        <label class="f"><span>부서</span><input id="ps_dept" type="text" placeholder="영업부"></label>
+        <label class="f"><span>직급</span><input id="ps_rank" type="text" placeholder="사원"></label>
+      </div>
+      <div class="row">
+        <label class="f"><span>입사일</span><input id="ps_join" type="date"></label>
+        <label class="f"><span>회사명</span><input id="ps_co" type="text" value="주식회사 이지웨이"></label>
+      </div>
+    </div>
+
+    <div class="sec">
+      <h2><span class="n">2</span>근로시간 (산출근거)</h2>
+      <div class="row">
+        <label class="f"><span>월 소정근로시간</span><input id="ps_regH" type="number" value="209"></label>
+        <label class="f"><span>총 근로일수</span><input id="ps_days" type="number" value="22"></label>
+        <label class="f"><span>연장 실근로(h)</span><input id="ps_otH" type="number" value="23.9" step="0.1"></label>
+      </div>
+      <div class="hint">근로기준법 시행령 제27조의2에 따라 <b>연장근로 시간 수를 명세서에 기재</b>해야 합니다.</div>
+    </div>
+
+    <div class="sec">
+      <h2><span class="n">3</span>지급 항목</h2>
+      <div class="cat">과세 항목</div>
+      <div class="g2"><div class="lb">기본급 <small>주휴 포함</small></div><input id="ps_base" type="number" value="1756880" step="1000"></div>
+      <div class="g2"><div class="lb">연장근로수당</div><input id="ps_ot" type="number" value="493120" step="10"></div>
+      <div class="g2"><div class="lb">기타 과세수당 <small>상여 등</small></div><input id="ps_etc" type="number" value="0" step="1000"></div>
+
+      <div class="cat">비과세 항목 <span style="font-weight:400;color:#999">— 금액·한도 입력</span></div>
+      <div class="g3h"><span>항목</span><span>지급액</span><span>비과세 한도</span></div>
+      <div class="g3"><div class="lb">식대</div><input id="ps_meal" type="number" value="200000" step="10000"><input id="ps_limMeal" class="nt" type="number" value="200000" step="10000"></div>
+      <div class="g3"><div class="lb">차량유지비</div><input id="ps_car" type="number" value="200000" step="10000"><input id="ps_limCar" class="nt" type="number" value="200000" step="10000"></div>
+      <div class="hint">한도 초과분은 <b>자동으로 과세 대상</b>에 포함됩니다.</div>
+    </div>
+
+    <div class="sec">
+      <h2><span class="n">4</span>공제 항목 · 요율</h2>
+      <div class="cat">4대보험 근로자 부담 (%)</div>
+      <div class="row">
+        <label class="f"><span>국민연금</span><input id="ps_rNp" type="number" value="4.75" step="0.005"></label>
+        <label class="f"><span>건강보험</span><input id="ps_rHi" type="number" value="3.595" step="0.005"></label>
+      </div>
+      <div class="row">
+        <label class="f"><span>장기요양 (건보료 대비)</span><input id="ps_rLtc" type="number" value="13.14" step="0.01"></label>
+        <label class="f"><span>고용보험</span><input id="ps_rEi" type="number" value="0.9" step="0.05"></label>
+      </div>
+      <div class="hint note"><b>2026년 기준</b> — 국민연금 9.5%(근로자 4.75%), 건강보험 7.19%(근로자 3.595%), 장기요양 건보료의 13.14%, 고용보험 0.9%. 국민연금은 2033년 13%까지 매년 0.5%p 인상됩니다.</div>
+      <div class="row" style="margin-top:10px">
+        <label class="f"><span>연금 기준소득 하한</span><input id="ps_npMin" type="number" value="400000" step="10000"></label>
+        <label class="f"><span>연금 기준소득 상한</span><input id="ps_npMax" type="number" value="6370000" step="10000"></label>
+      </div>
+
+      <div class="cat">소득세</div>
+      <label class="f"><span>계산 방식</span>
+        <select id="ps_taxMode"><option value="auto" selected>자동 계산 (간이세액표 근사)</option><option value="manual">직접 입력</option></select>
+      </label>
+      <div class="row" id="ps_manual" style="display:none">
+        <label class="f"><span>소득세</span><input id="ps_mTax" type="number" value="0" step="10"></label>
+        <label class="f"><span>지방소득세</span><input id="ps_mLtax" type="number" value="0" step="10"></label>
+      </div>
+      <div class="row">
+        <label class="f"><span>공제대상 가족수</span><input id="ps_family" type="number" value="1" min="1"></label>
+        <label class="f"><span>8~20세 자녀수</span><input id="ps_kids" type="number" value="0" min="0"></label>
+      </div>
+      <div class="hint note">자동 계산은 국세청 <b>간이세액표 산출기준을 근사</b>한 값입니다. 연말정산 전 정식 표로 검증하세요.</div>
+
+      <div class="cat">기타 공제</div>
+      <div class="g2"><div class="lb">노동조합비 · 기타</div><input id="ps_dEtc" type="number" value="0" step="1000"></div>
+      <div class="calcbox" id="ps_result"></div>
+    </div>
+
+    <div class="foot">
+      <button class="btn print" onclick="window.print()">🖨️ 인쇄 / PDF</button>
+      <button class="btn ghost" onclick="resetP()">초기화</button>
+    </div>
+  </div>
+  <div class="preview-wrap"><div class="sheet doc" id="doc2"></div></div>
+</div>
+
+<div class="modal" id="loadModal">
+  <div class="modalbox">
+    <div class="mh" id="loadTitle">저장한 근로자</div>
+    <div class="mb" id="loadList"></div>
+    <div class="mf"><button class="minibtn" style="width:auto;padding:9px 18px" onclick="closeLoad()">닫기</button></div>
+  </div>
+</div>
+
+<script>
+const $=id=>document.getElementById(id);
+const won=n=>(Math.round(n)||0).toLocaleString('ko-KR');
+const val=id=>($(id)?.value||'').trim();
+const num=id=>parseFloat($(id)?.value)||0;
+const floor10=n=>Math.floor(n/10)*10;
+const WEEKS=4.345, OT_RATE=1.5;
+function hm(t){ const m=(t||'').match(/(\d{1,2})\s*:\s*(\d{2})/); return m? +m[1]+(+m[2])/60:0; }
+function fmtDate(v){ if(!v) return '____년 __월 __일'; const [y,m,d]=v.split('-'); return `${y}년 ${+m}월 ${+d}일`; }
+function fd(v){ if(!v) return '-'; const [y,m,d]=v.split('-'); return `${y}.${m}.${d}`; }
+function blank(v,ph){ return v? v : `<span style="color:#999">${ph}</span>`; }
+
+/* ═══ 탭 ═══ */
+function showView(n){
+  [1,2].forEach(i=>{ $('v'+i).classList.toggle('on', i===n); $('t'+i).classList.toggle('on', i===n); });
+  window.scrollTo(0,0);
+}
+
+/* ═══ 저장소 ═══ */
+const KEY_W='ewh_nomu_workers', KEY_C='ewh_nomu_company';
+function store(k,o){ try{ localStorage.setItem(k,JSON.stringify(o)); return true; }catch(e){ return false; } }
+function fetchStore(k,f){ try{ const r=localStorage.getItem(k); return r?JSON.parse(r):f; }catch(e){ return f; } }
+const WF=['empName','empAddr','empTel','empEmail','empFamily','empChildren','empJob','empPlace',
+ 'startDate','endDate','contractType','probMonth','probPct','wdStart','wdEnd','wdRest','wdDays',
+ 'satFreq','satStart','satEnd','satRest','weeklyOff','minWage','buffer','targetTotal',
+ 'p_base','p_meal','p_car','p_ot','payTerm','payDay'];
+const CF=['coName','coCeo','coAddr','coTel'];
+
+function saveCompany(){ const o={}; CF.forEach(f=>o[f]=val(f));
+  store(KEY_C,o)?alert('회사 정보를 저장했습니다.'):alert('이 브라우저에서는 저장할 수 없습니다.'); }
+function loadCompany(){ const o=fetchStore(KEY_C,null);
+  if(o){ CF.forEach(f=>{ if(o[f]&&$(f)) $(f).value=o[f]; }); if(o.coName) $('ps_co').value=o.coName; } }
+
+function saveWorker(){
+  const name=val('empName'); if(!name){ alert('근로자 성명을 먼저 입력해 주세요.'); return; }
+  const list=fetchStore(KEY_W,[]); const data={};
+  WF.forEach(f=>data[f]=$(f)?$(f).value:''); data.designMode=designMode;
+  const t=calcTime(); data._monthReg=t.monthReg; data._otH=t.monthOt.toFixed(1);
+  data._days=Math.round(num('wdDays')*WEEKS+num('satFreq'));
+  const i=list.findIndex(w=>w.name===name&&w.startDate===val('startDate'));
+  const rec={id:i>=0?list[i].id:'WK-'+Date.now().toString(36).toUpperCase(),
+    name,startDate:val('startDate'),savedAt:new Date().toISOString().slice(0,10),data};
+  if(i>=0) list[i]=rec; else list.push(rec);
+  store(KEY_W,list)
+    ? (showLoaded(rec), alert(`저장 완료\n\n근로자 코드 : ${rec.id}\n성명 : ${name}\n\n임금명세서 탭에서 불러올 수 있습니다.`))
+    : alert('이 브라우저에서는 저장할 수 없습니다.');
+}
+function showLoaded(r){ const b=$('loadedInfo'); b.style.display='block';
+  b.innerHTML=`현재 근로자 <b>${r.name}</b> · 코드 <b>${r.id}</b> · 저장 ${r.savedAt}`; }
+
+let loadTarget=1;
+function openLoad(target){
+  loadTarget=target;
+  $('loadTitle').textContent = target===1?'저장한 근로자 — 불러오기':'근로계약서에 저장된 근로자';
+  const list=fetchStore(KEY_W,[]), box=$('loadList');
+  box.innerHTML=!list.length
+    ? '<div class="empty">저장된 근로자가 없습니다.<br>근로계약서 탭에서 먼저<br>“💾 이 근로자 저장하기”를 눌러 주세요.</div>'
+    : list.slice().reverse().map(w=>`<div class="wrow" onclick="applyWorker('${w.id}')">
+        <div><div class="nm">${w.name}</div><div class="sub">${w.id} · 입사 ${w.startDate||'-'} · 저장 ${w.savedAt}</div></div>
+        ${target===1?`<button class="del" onclick="event.stopPropagation();delWorker('${w.id}')">삭제</button>`
+                    :'<div style="color:#0f7a3d;font-weight:700;font-size:12px">불러오기 →</div>'}</div>`).join('');
+  $('loadModal').classList.add('on');
+}
+function closeLoad(){ $('loadModal').classList.remove('on'); }
+function delWorker(id){ if(!confirm('삭제할까요?')) return; store(KEY_W,fetchStore(KEY_W,[]).filter(w=>w.id!==id)); openLoad(loadTarget); }
+
+function applyWorker(id){
+  const r=fetchStore(KEY_W,[]).find(w=>w.id===id); if(!r) return;
+  const d=r.data||{};
+  if(loadTarget===1){
+    WF.forEach(f=>{ if(d[f]!==undefined&&$(f)) $(f).value=d[f]; });
+    $('empRrn').value='';
+    if(d.designMode) setMode(d.designMode);
+    showLoaded(r); updateC();
+  } else {
+    const set=(f,v)=>{ if($(f)&&v!==undefined&&v!=='') $(f).value=v; };
+    set('ps_name',r.name); set('ps_no',r.id); set('ps_join',d.startDate);
+    set('ps_family',d.empFamily); set('ps_kids',d.empChildren);
+    set('ps_base',d.p_base); set('ps_meal',d.p_meal); set('ps_car',d.p_car); set('ps_ot',d.p_ot);
+    set('ps_regH',d._monthReg); set('ps_otH',d._otH); set('ps_days',d._days);
+    const b=$('ps_loaded'); b.style.display='block';
+    b.innerHTML=`불러옴 — <b>${r.name}</b> · ${r.id} · 계약서 저장일 ${r.savedAt}`;
+    updateP();
+  }
+  closeLoad();
+}
+
+/* ═══════════ 01 근로계약서 ═══════════ */
+function calcTime(){
+  const wdH=Math.max(0, hm(val('wdEnd'))-hm(val('wdStart'))-num('wdRest')/60);
+  const wdDays=num('wdDays'), weekWd=wdH*wdDays, satFreq=num('satFreq');
+  const satH=satFreq>0?Math.max(0,hm(val('satEnd'))-hm(val('satStart'))-num('satRest')/60):0;
+  const weekOt=Math.max(Math.max(0,wdH-8)*wdDays, Math.max(0,weekWd-40));
+  const weekReg=Math.min(weekWd,40);
+  const monthReg=Math.round((weekReg+(weekWd>=15?Math.min(wdH,8):0))*WEEKS);
+  const monthOtWd=weekOt*WEEKS, monthOtSat=satH*satFreq, monthOt=monthOtWd+monthOtSat;
+  return {wdH,satH,satFreq,weekWd,weekReg,monthReg,monthOtWd,monthOtSat,monthOt,
+          legalOtHours:monthOt*OT_RATE, weekAvg:weekWd+satH*satFreq/WEEKS};
+}
+function renderTime(t){
+  $('timeBox').innerHTML=`
+    <div class="line"><span>평일 1일 실근로</span><b>${t.wdH.toFixed(1)} 시간</b></div>
+    ${t.satFreq>0?`<div class="line"><span>토요일 1일 실근로</span><b>${t.satH.toFixed(1)} 시간</b></div>`:''}
+    <div class="line big"><span>월 소정근로 (주휴 포함)</span><b>${t.monthReg} 시간</b></div>
+    <div class="line" style="margin-top:5px"><span>월 실연장 · 평일</span><b>${t.monthOtWd.toFixed(2)} h</b></div>
+    ${t.satFreq>0?`<div class="line"><span>월 실연장 · 토요일</span><b>${t.monthOtSat.toFixed(2)} h</b></div>`:''}
+    <div class="line"><span>월 실연장 합계</span><b>${t.monthOt.toFixed(2)} h</b></div>
+    <div class="line"><span>법정 필요 할증시간 (×1.5)</span><b>${t.legalOtHours.toFixed(2)} h</b></div>
+    <div class="sub">주 평균 실근로 ${t.weekAvg.toFixed(1)}시간 · 주 연장 ${(t.monthOt/WEEKS).toFixed(1)}시간</div>
+    ${t.weekAvg>52?`<div class="flag err">⚠️ 주 평균 ${t.weekAvg.toFixed(1)}시간 — 주 52시간 한도 초과</div>`:''}
+    ${(t.monthOt/WEEKS)>12?`<div class="flag err">⚠️ 주 연장 ${(t.monthOt/WEEKS).toFixed(1)}시간 — 12시간 한도 초과</div>`:''}`;
+}
+
+let designMode='total';
+function setMode(m){
+  designMode=m;
+  document.querySelectorAll('#designMode button').forEach(x=>x.classList.toggle('on',x.dataset.d===m));
+  $('dm_total').style.display=m==='total'?'block':'none';
+  $('modeHint').innerHTML=m==='total'
+    ? '총액을 넣으면 통상임금을 최저시급에 맞추고, <b>나머지 전액을 약정연장수당</b>으로 배분합니다.'
+    : '통상임금을 최저시급에 맞추고, <b>법정 연장수당(실연장 ×1.5)만</b> 지급하는 최소 구성입니다.';
+}
+document.querySelectorAll('#designMode button').forEach(b=>b.onclick=()=>{ setMode(b.dataset.d); updateC(); });
+
+function calcWage(t){
+  const mw=num('minWage'), buf=1+num('buffer')/100;
+  const meal=num('p_meal'), car=num('p_car');
+  const targetOrd=Math.round(mw*buf*t.monthReg);
+  const base=Math.max(0, targetOrd-meal-car);
+  const ordinary=base+meal+car;
+  const hourly=t.monthReg>0?ordinary/t.monthReg:0;
+  const legalOtPay=hourly*t.legalOtHours;
+  const otPay = designMode==='total' ? Math.max(0, num('targetTotal')-ordinary) : Math.round(legalOtPay);
+  return {base,meal,car,ordinary,hourly,otPay,legalOtPay,
+          revHours:hourly>0?otPay/hourly:0, total:ordinary+otPay,
+          nonTax:Math.min(meal,200000)+Math.min(car,200000),
+          minWage:mw, targetOrd, overflow:(meal+car>targetOrd)};
+}
+
+function renderWage(t,w){
+  $('p_base').value=Math.round(w.base);
+  $('p_ot').value=Math.round(w.otPay);
+  $('v_ord').textContent=won(w.ordinary);
+  $('v_total').textContent=won(w.total);
+  $('lb_ot').textContent=`역산 ${w.revHours.toFixed(2)}h · 최저임금 산입 안 됨`;
+
+  const gap=w.hourly-w.minWage;
+  const gapTxt=Math.abs(gap)<1?'최저시급과 일치'
+    :gap>0?`최저시급 +${won(gap)}원 (+${(gap/w.minWage*100).toFixed(1)}%)`:`최저시급 −${won(-gap)}원`;
+
+  let h=`<div class="line big"><span>통상시급</span><b>${won(w.hourly)} 원</b></div>
+    <div class="sub">= 통상임금 ${won(w.ordinary)} ÷ ${t.monthReg}시간</div>
+    <div class="line" style="margin-top:5px"><span>최저시급 대비</span>
+      <b style="color:${gap<-0.5?'#c62828':Math.abs(gap)<1?'#b45309':'#0f7a3d'}">${gapTxt}</b></div>
+    <div class="line"><span>비과세 합계</span><b>${won(w.nonTax)} 원</b></div>
+    <div class="sub">과세 대상 ${won(w.total-w.nonTax)}원 — 4대보험·소득세는 이 금액 기준</div>`;
+
+  h += w.hourly < w.minWage-0.5
+    ? `<div class="flag err">⚠️ 최저임금 위반 — 통상시급 ${won(w.hourly)}원 &lt; ${won(w.minWage)}원</div>`
+    : `<div class="flag ok">✓ 최저임금 충족 — 기본급·식대·차량유지비 모두 산입 항목입니다.</div>`;
+
+  if(t.legalOtHours>0){
+    const diff=w.otPay-w.legalOtPay;
+    h += diff>=-1
+      ? `<div class="flag ok">✓ 연장수당 적법 — 지급 ${w.revHours.toFixed(2)}h ≥ 법정 ${t.legalOtHours.toFixed(2)}h${diff>1?` (여유 ${won(diff)}원)`:''}</div>`
+      : `<div class="flag err">⚠️ 연장수당 ${won(-diff)}원 부족 — 총액을 <b>${won(w.ordinary+w.legalOtPay)}원</b> 이상으로 올려주세요.</div>`;
+  }
+  if(w.overflow) h+=`<div class="flag err">⚠️ 식대+차량유지비가 목표 통상임금을 초과해 기본급이 0원이 되었습니다.</div>`;
+  const pp=num('probPct');
+  if(pp<100 && w.hourly*pp/100 < w.minWage*0.9)
+    h+=`<div class="flag err">⚠️ 수습 시급이 최저임금의 90%(${won(w.minWage*0.9)}원)에 미달합니다.</div>`;
+  if(w.meal>200000) h+=`<div class="flag warn">식대 20만원 초과분 ${won(w.meal-200000)}원은 과세됩니다.</div>`;
+  if(w.car>200000)  h+=`<div class="flag warn">차량유지비 20만원 초과분 ${won(w.car-200000)}원은 과세됩니다.</div>`;
+  $('wageBox').innerHTML=h;
+}
+
+function renderDoc1(t,w){
+  const isFixed=$('contractType').value==='fixed', prob=num('probMonth');
+  if(isFixed&&val('startDate')&&val('endDate')){
+    const d1=new Date(val('startDate')),d2=new Date(val('endDate'));
+    const mo=Math.round((d2-d1)/(1000*60*60*24*30.44));
+    $('termLabel').value= mo>=12?`${(mo/12).toFixed(1).replace('.0','')}년`:`${mo}개월`;
+  }
+  const satLabel={'0':'','1':'월 1회','2.1726':'격주','4.345':'매주'}[val('satFreq')]||'격주';
+  const wdTime=`월-금(주 ${num('wdDays')}일) : ${val('wdStart')}~${val('wdEnd')} (실근로 ${t.wdH.toFixed(1)}시간)`;
+  const satTime=t.satFreq>0?`<br>　　토(${satLabel}) : ${val('satStart')}~${val('satEnd')} (실근로 ${t.satH.toFixed(1)}시간)`:'';
+  const rows=[
+    ['기본급 [주휴포함]',w.base,`월 ${t.monthReg}시간 × 통상시급`],
+    ['식　　대',w.meal,w.meal?'비과세 (월 20만원 한도)':''],
+    ['차량유지비',w.car,w.car?'비과세 (월 20만원 한도)':''],
+    ['약 정 연 장 수 당',w.otPay,`월 평균 할증 ${w.revHours.toFixed(2)}시간 × 통상시급`]
+  ].filter(r=>r[1]>0)
+   .map(r=>`<tr><td class="lbl" style="width:30%">${r[0]}</td><td class="num" style="width:22%">${won(r[1])}</td><td style="font-size:9.6px;color:#444">${r[2]}</td></tr>`).join('');
+
+  $('doc1').innerHTML=`
+  <div class="title">월 급 제 근 로 계 약 서 ${isFixed?'( 계 약 직 )':''}</div>
+  <div class="topsign">근로계약서 서면 교부 확인 : ________________ [서 명]</div>
+  <div class="artH">제 1 조 (당사자 표시)</div>
+  <table>
+    <tr><td class="lbl" style="width:11%">사업체명</td><td style="width:33%">${blank(val('coName'),'사업체명')}</td>
+        <td class="lbl" style="width:11%">대 표 자</td><td>${blank(val('coCeo'),'대표자')}</td></tr>
+    <tr><td class="lbl">소 재 지</td><td>${blank(val('coAddr'),'소재지')}</td>
+        <td class="lbl">연 락 처</td><td>${blank(val('coTel'),'연락처')}</td></tr>
+    <tr><td class="lbl">성　　명</td><td>${blank(val('empName'),'근로자 성명')}</td>
+        <td class="lbl">생년월일</td><td>${blank(val('empRrn'),'주민등록번호')}</td></tr>
+    <tr><td class="lbl">주　　소</td><td>${blank(val('empAddr'),'주소')}</td>
+        <td class="lbl">연 락 처</td><td>${blank(val('empTel'),'연락처')}</td></tr>
+  </table>
+  <div class="artH">제 2 조 (근로계약기간)</div>
+  <div class="artP">① 입 사 일 : ${fmtDate(val('startDate'))}</div>
+  <div class="artP">② 근로조건적용기간 : ${isFixed?`${fmtDate(val('startDate'))} ~ ${fmtDate(val('endDate'))} (${val('termLabel')})`:`${fmtDate(val('startDate'))}부터 기간의 정함이 없음`}</div>
+  ${prob>0?`<div class="artP">③ 신규 채용된 직원에 대해서는 입사일부터 ${prob}개월(${prob}개월 연장가능)간 수습기간을 거치며, 근무태도 및 성적이 불량하거나 소질이 적당하지 않다고 인정된 경우 정규채용하지 않을 수 있다. 단 수습기간은 근속년수에 산입한다.</div>`:''}
+  <div class="artP">④ 근로계약기간 만료 시 고용관계가 종료되는 것을 원칙으로 하며, 계약기간 중 퇴사를 희망할 경우 퇴사희망일 30일 전까지 서면으로 사직서를 제출하고 수리될 때까지 정상 근무해야 한다.</div>
+  <div class="artH">제 3 조 (취업장소 및 취업직종)</div>
+  <div class="artP">① 취업장소 : ${blank(val('empPlace'),'취업장소')}　　② 담당업무 : ${blank(val('empJob'),'담당업무')}</div>
+  <div class="artP">③ 회사의 경영사정에 따라 전보·전직 및 전적 등 인사명령을 할 수 있으며 직원은 이에 따르기로 한다.</div>
+  <div class="artH">제 4 조 (근로시간 및 휴게시간)</div>
+  <div class="artP">① 근로시간 : ${wdTime}${satTime}</div>
+  <div class="artP">② 휴게시간 : 평일 ${num('wdRest')}분${t.satFreq>0?` / 토요일 ${num('satRest')}분`:''} (근로시간에 산입하지 아니함)</div>
+  <div class="artP">③ 소정근로시간은 1주 ${t.weekReg.toFixed(0)}시간, 월 ${t.monthReg}시간(주휴 포함)으로 한다.</div>
+  <div class="artP">④ 전 각 항은 회사의 경영상 필요와 계절의 변화에 의해 변경될 수 있으며, 해당 직원은 근로형태에 따라 발생되는 연장·야간·휴일근무를 제공한다.</div>
+  <div class="artH">제 5 조 (휴일 및 휴가)</div>
+  <div class="artP">① 일주일을 개근한 직원에 대하여는 주 1일의 유급휴일을 부여한다. (주휴일 : ${val('weeklyOff')})</div>
+  <div class="artP">② 근로자의 날(5월 1일)은 유급휴일로 한다.</div>
+  <div class="artP">③ 연차유급휴가 및 생리휴가(무급/여성)는 직원의 청구와 회사 업무에 지장이 없는 범위 내에서 사용할 수 있으며, 연차유급휴가 신청은 사용일 최소 7일 이전 제출을 원칙으로 한다.</div>
+  <div class="artP">④ 경영상 필요 시 직원과 협의하에 휴일 및 휴가일이 변경 또는 수당으로 대체 지급될 수 있다.</div>
+  <div class="artP">⑤ 연차유급휴가 산정을 위한 근무기간은 직원에게 불이익을 주지 않는 범위 내에서 회계년도 단위로 산정한다. 단, 퇴직 시에는 전체 근속기간을 통산하여 입사일 기준으로 가감정산한다.</div>
+  <div class="artH">제 6 조 (복리후생)</div>
+  <div class="artP">4대보험(고용·건강·국민연금·산업재해)은 입사일을 기준으로 적용하며, 직원의 부담금은 임금에서 공제한다.</div>
+  <div class="artH">제 7 조 (안전관리)</div>
+  <div class="artP">직원은 회사가 정한 안전관리에 관한 제규칙과 관리자의 지시사항을 준수하며, 업무상 재해 발생 시 산업재해보상보험법이 정하는 바에 따른다.</div>
+  <div class="artH">제 8 조 (임금)</div>
+  <div class="artP">① 월급총액은 제4조의 소정근로시간 및 이를 초과한 월 약정 연장근무 시간에 대한 수당이 포함된 금액이며, 구성내역은 다음과 같다.</div>
+  <table class="wagebox">
+    <tr><td class="lbl" style="background:#e4e9f0">월 간 급 여 총 액 (세전)</td>
+        <td class="num" style="font-weight:800;background:#e4e9f0">${won(w.total)}</td>
+        <td style="background:#e4e9f0;font-size:9.8px">통상시급 : <b>${won(w.hourly)}</b>원　(월 ${t.monthReg}시간 기준)</td></tr>
+    ${rows}
+  </table>
+  <div class="artP">② 월급여액은 ${val('payTerm')}까지 정산하고, ${val('payDay')}에 직원 명의의 은행계좌로 입금함을 원칙으로 한다.</div>
+  ${prob>0?`<div class="artP">③ 신규 입사자의 수습기간(${prob}개월)의 임금은 별도의 임금액으로 지급할 수 있다. 단 당해년도 최저임금의 90% 이상을 지급한다.</div>`:''}
+  <div class="artP">④ 결근 시 월간 일수에 비례해 일할계산 및 공제하며, 주휴 및 지각·조퇴의 경우 통상시급으로 차감한다. 단, 회사의 결정에 의해 지각·조퇴·외출의 누계 8시간을 연차 1일 사용한 것으로 계산할 수 있다.</div>
+  <div class="artH">제 9 조 (퇴직금)</div>
+  <div class="artP">퇴직금은 근로자퇴직급여보장법이 정하는 바에 따른다.</div>
+  <div class="artH">제 10 조 (해고 및 징계)</div>
+  <div class="artP">직원이 다음 각 호의 행위를 한 경우 회사는 징계할 수 있으며, 사유와 정도가 중할 경우 해고 등 중징계를 할 수 있다.</div>
+  <div class="artP">① 근무태만이나 과실로 회사에 손실을 끼치거나 근무기강 문란행위를 한 경우</div>
+  <div class="artP">② 회사의 허가 없이 다른 업무를 겸직하거나 타 직원을 선동한 경우</div>
+  <div class="artP">③ 회사의 허가 없이 비품·자산 등을 외부로 반출하거나 대여한 경우</div>
+  <div class="artP">④ 기타 이에 준하는 행위로 회사 업무에 지장을 초래한 경우</div>
+  <div class="artH">제 11 조 (기 타)</div>
+  <div class="artP">① 직원이 고의 또는 중대한 과실로 회사 재산상의 손해를 입혔거나 명예를 훼손한 경우 이를 배상하여야 한다.</div>
+  <div class="artP">② 무단결근이 연속 3일 이상 계속되어 근로관계 지속이 곤란할 경우 당연퇴직을 원칙으로 한다.</div>
+  <div class="artP">③ 소관업무가 개인정보 및 기밀사항임을 인식하고 개인정보보호법 및 제반 보안관계지침을 성실히 수행한다.</div>
+  <div class="artP">④ 재직 중은 물론 퇴직 후에도 알게 된 모든 개인정보 및 기밀사항을 일체 타인에게 누설하지 아니한다.</div>
+  <div class="artH">* 특약 사항</div>
+  <div class="artP">본 계약서에 없는 사항에 대해서는 노동관계법령 및 제규정과 회사의 해석에 따르기로 한다. 또한 본 계약이 쌍방 당사자의 성실하고 자유로운 진의의 의사표시에 따른 계약으로 상기 근로조건에 동의하는 바, 당사자가 아래에 서명 및 날인한다.</div>
+  <div class="datestr">${fmtDate(val('signDate'))}</div>
+  <div class="sign-row">
+    <div class="sign-box">
+      <div class="sign-line"><span class="k">사 업 장 명</span><span class="v">${val('coName')||''}</span></div>
+      <div class="sign-line"><span class="k">대 표 이 사</span><span class="v">${val('coCeo')||''}</span><span class="k">(서명/인)</span></div>
+    </div>
+    <div class="sign-box">
+      <div class="sign-line"><span class="k">근 로 자</span><span class="v">${val('empName')||''}</span><span class="k">(서명/인)</span></div>
+    </div>
+  </div>`;
+}
+
+function updateC(){
+  $('endWrap').style.display=$('contractType').value==='fixed'?'flex':'none';
+  $('satWrap').style.display=num('satFreq')>0?'flex':'none';
+  const t=calcTime(); renderTime(t);
+  const w=calcWage(t); renderWage(t,w); renderDoc1(t,w);
+}
+
+/* ═══════════ 02 임금명세서 ═══════════ */
+function incomeTax(mTaxable, family, kids, pensionMonthly){
+  const T=mTaxable*12; let ded;
+  if(T<=5e6) ded=T*0.7;
+  else if(T<=15e6) ded=3.5e6+(T-5e6)*0.4;
+  else if(T<=45e6) ded=7.5e6+(T-15e6)*0.15;
+  else if(T<=1e8) ded=12e6+(T-45e6)*0.05;
+  else ded=14.75e6+(T-1e8)*0.02;
+  const inc=T-Math.min(ded,2e7);
+  const basic=1.5e6*Math.max(1,family), pension=pensionMonthly*12;
+  let sp;
+  if(T<=3e7) sp=3.1e6+T*0.04;
+  else if(T<=4.5e7) sp=3.1e6+T*0.04-(T-3e7)*0.05;
+  else if(T<=7e7) sp=3.1e6+T*0.02;
+  else sp=Math.max(0,3.1e6+T*0.02-(T-7e7)*0.04);
+  const base=Math.max(0, inc-basic-pension-sp);
+  const br=[[14e6,.06,0],[50e6,.15,1.26e6],[88e6,.24,5.76e6],[150e6,.35,15.44e6],[300e6,.38,19.94e6]];
+  let tax=base*0.40-25.94e6;
+  for(const [lim,r,d] of br){ if(base<=lim){ tax=base*r-d; break; } }
+  tax=Math.max(0,tax);
+  let credit=tax<=1.3e6?tax*0.55:715000+(tax-1.3e6)*0.30;
+  credit=Math.min(credit, T<=33e6?740000:Math.max(660000,740000-(T-33e6)*0.008));
+  const kidc=kids<=0?0:kids===1?150000:kids===2?350000:350000+300000*(kids-2);
+  return Math.max(0, floor10((tax-credit-kidc)/12));
+}
+
+function calcPay(){
+  const base=num('ps_base'), ot=num('ps_ot'), etc=num('ps_etc');
+  const meal=num('ps_meal'), car=num('ps_car');
+  const ntMeal=Math.min(meal,num('ps_limMeal')), ntCar=Math.min(car,num('ps_limCar'));
+  const nonTax=ntMeal+ntCar, over=(meal-ntMeal)+(car-ntCar);
+  const gross=base+ot+etc+meal+car, taxable=gross-nonTax;
+
+  const npBase=Math.min(Math.max(taxable,num('ps_npMin')),num('ps_npMax'));
+  const np=floor10(npBase*num('ps_rNp')/100);
+  const hi=floor10(taxable*num('ps_rHi')/100);
+  const ltc=floor10(hi*num('ps_rLtc')/100);
+  const ei=floor10(taxable*num('ps_rEi')/100);
+
+  let tax,ltax;
+  if(val('ps_taxMode')==='manual'){ tax=num('ps_mTax'); ltax=num('ps_mLtax'); }
+  else { tax=incomeTax(taxable,num('ps_family'),num('ps_kids'),np); ltax=floor10(tax*0.1); }
+
+  const dEtc=num('ps_dEtc'), deduct=np+hi+ltc+ei+tax+ltax+dEtc;
+  return {base,ot,etc,meal,car,ntMeal,ntCar,nonTax,over,gross,taxable,
+          np,hi,ltc,ei,tax,ltax,dEtc,deduct,net:gross-deduct};
+}
+
+function renderPayResult(c){
+  let h=`<div class="line"><span>지급 총액</span><b style="color:#1e4b8f">${won(c.gross)} 원</b></div>
+    <div class="line"><span>비과세 합계</span><b>${won(c.nonTax)} 원</b></div>
+    <div class="line"><span>과세 대상</span><b>${won(c.taxable)} 원</b></div>
+    <div class="line" style="margin-top:5px"><span>국민연금</span><b style="color:#c62828">−${won(c.np)}</b></div>
+    <div class="line"><span>건강보험</span><b style="color:#c62828">−${won(c.hi)}</b></div>
+    <div class="line"><span>장기요양보험</span><b style="color:#c62828">−${won(c.ltc)}</b></div>
+    <div class="line"><span>고용보험</span><b style="color:#c62828">−${won(c.ei)}</b></div>
+    <div class="line"><span>소득세</span><b style="color:#c62828">−${won(c.tax)}</b></div>
+    <div class="line"><span>지방소득세</span><b style="color:#c62828">−${won(c.ltax)}</b></div>
+    ${c.dEtc?`<div class="line"><span>기타 공제</span><b style="color:#c62828">−${won(c.dEtc)}</b></div>`:''}
+    <div class="line"><span>공제 합계</span><b style="color:#c62828">−${won(c.deduct)} 원</b></div>
+    <div class="line big"><span>실 지급액</span><b>${won(c.net)} 원</b></div>
+    <div class="sub">공제율 ${(c.deduct/c.gross*100).toFixed(1)}% · 비과세 비중 ${(c.nonTax/c.gross*100).toFixed(1)}%</div>`;
+  if(c.over>0) h+=`<div class="flag warn">비과세 한도 초과 ${won(c.over)}원은 과세 대상에 포함되었습니다.</div>`;
+  if(c.nonTax>0) h+=`<div class="flag ok">비과세 ${won(c.nonTax)}원 적용 — 4대보험료와 소득세가 함께 낮아집니다.</div>`;
+  $('ps_result').innerHTML=h;
+}
+
+function renderDoc2(c){
+  const ymv=val('ps_ym');
+  const ymTxt=ymv?`${ymv.split('-')[0]}년 ${+ymv.split('-')[1]}월`:'____년 __월';
+  const hourly=num('ps_regH')>0?(c.base+c.ntMeal+c.ntCar)/num('ps_regH'):0;
+  const payRows=[
+    ['기본급',c.base,`월 소정근로 ${num('ps_regH')}시간`],
+    ['연장근로수당',c.ot,num('ps_otH')?`연장 ${num('ps_otH')}시간 × 통상시급 × 1.5`:''],
+    ['기타수당',c.etc,''],
+    ['식대',c.meal,c.ntMeal?`비과세 ${won(c.ntMeal)}원`:''],
+    ['차량유지비',c.car,c.ntCar?`비과세 ${won(c.ntCar)}원`:'']
+  ].filter(r=>r[1]>0)
+   .map(r=>`<tr><td class="lbl" style="text-align:left;width:30%">${r[0]}</td><td class="num" style="width:22%">${won(r[1])}</td><td class="calcnote">${r[2]}</td></tr>`).join('');
+  const dedRows=[
+    ['국민연금',c.np,`과세소득 × ${num('ps_rNp')}%`],
+    ['건강보험',c.hi,`과세소득 × ${num('ps_rHi')}%`],
+    ['장기요양보험',c.ltc,`건강보험료 × ${num('ps_rLtc')}%`],
+    ['고용보험',c.ei,`과세소득 × ${num('ps_rEi')}%`],
+    ['소득세',c.tax,`간이세액표 (공제대상 ${num('ps_family')}명${num('ps_kids')?`, 자녀 ${num('ps_kids')}명`:''})`],
+    ['지방소득세',c.ltax,'소득세 × 10%'],
+    ['기타공제',c.dEtc,'']
+  ].filter(r=>r[1]>0)
+   .map(r=>`<tr><td class="lbl" style="text-align:left;width:30%">${r[0]}</td><td class="num" style="width:22%">${won(r[1])}</td><td class="calcnote">${r[2]}</td></tr>`).join('');
+
+  $('doc2').innerHTML=`
+  <div class="title">임 금 명 세 서</div>
+  <div class="subtitle">${ymTxt} 귀속 · 지급일 ${fd(val('ps_payDate'))}</div>
+  <table>
+    <tr><td class="lbl">회 사 명</td><td>${val('ps_co')||'-'}</td><td class="lbl">성　　명</td><td>${val('ps_name')||'-'}</td></tr>
+    <tr><td class="lbl">부　　서</td><td>${val('ps_dept')||'-'}</td><td class="lbl">사원번호</td><td>${val('ps_no')||'-'}</td></tr>
+    <tr><td class="lbl">직　　급</td><td>${val('ps_rank')||'-'}</td><td class="lbl">입 사 일</td><td>${fd(val('ps_join'))}</td></tr>
+  </table>
+  <table>
+    <tr><th colspan="4">근 로 시 간</th></tr>
+    <tr><td class="lbl">총 근로일수</td><td class="num">${num('ps_days')} 일</td>
+        <td class="lbl">월 소정근로</td><td class="num">${num('ps_regH')} 시간</td></tr>
+    <tr><td class="lbl">연장근로</td><td class="num">${num('ps_otH')} 시간</td>
+        <td class="lbl">통상시급</td><td class="num">${won(hourly)} 원</td></tr>
+  </table>
+  <table>
+    <tr><th class="payhead" colspan="3">지 급 내 역</th></tr>
+    <tr><th style="width:30%">항　목</th><th style="width:22%">금　액 (원)</th><th>계 산 방 법</th></tr>
+    ${payRows}
+    <tr class="totrow"><td style="text-align:center">지 급 총 액</td><td class="num">${won(c.gross)}</td>
+        <td class="calcnote">비과세 ${won(c.nonTax)}원 포함 · 과세대상 ${won(c.taxable)}원</td></tr>
+  </table>
+  <table>
+    <tr><th class="dedhead" colspan="3">공 제 내 역</th></tr>
+    <tr><th style="width:30%">항　목</th><th style="width:22%">금　액 (원)</th><th>계 산 방 법</th></tr>
+    ${dedRows}
+    <tr class="totrow"><td style="text-align:center">공 제 총 액</td><td class="num">${won(c.deduct)}</td>
+        <td class="calcnote">지급총액 대비 ${(c.deduct/c.gross*100).toFixed(1)}%</td></tr>
+  </table>
+  <table>
+    <tr class="netrow"><td style="text-align:center;width:30%">실 지 급 액</td><td class="num" style="width:22%">${won(c.net)}</td>
+        <td style="font-size:10px;color:#0f7a3d">지급총액 ${won(c.gross)} − 공제총액 ${won(c.deduct)}</td></tr>
+  </table>
+  <div class="foot-note">
+    ※ 통상시급 ${won(hourly)}원 (통상임금 ÷ 월 소정근로 ${num('ps_regH')}시간) 기준으로 각 수당을 산정하였습니다.<br>
+    ※ 이 명세서는 근로기준법 제48조 제2항 및 같은 법 시행령 제27조의2에 따라 교부되는 서류입니다.<br>
+    ※ 기재 내용에 이의가 있는 경우 지급일로부터 14일 이내에 회사에 정정을 요청할 수 있습니다.
+  </div>
+  <div class="docsign">${val('ps_co')||'회사명'}　(인)</div>`;
+}
+
+function updateP(){
+  $('ps_manual').style.display=val('ps_taxMode')==='manual'?'flex':'none';
+  const c=calcPay(); renderPayResult(c); renderDoc2(c);
+}
+
+/* ═══ 바인딩 ═══ */
+document.querySelectorAll('#v1 input, #v1 select').forEach(el=>{
+  el.addEventListener('input',updateC); el.addEventListener('change',updateC); });
+document.querySelectorAll('#v2 input, #v2 select').forEach(el=>{
+  el.addEventListener('input',updateP); el.addEventListener('change',updateP); });
+$('loadModal').addEventListener('click',e=>{ if(e.target.id==='loadModal') closeLoad(); });
+
+function resetC(){
+  if(!confirm('입력 내용을 지울까요?\n(저장된 근로자 목록은 유지됩니다)')) return;
+  ['empName','empRrn','empAddr','empTel','empEmail'].forEach(f=>$(f).value='');
+  $('empFamily').value=1; $('empChildren').value=0;
+  $('loadedInfo').style.display='none'; updateC();
+}
+function resetP(){
+  if(!confirm('입력 내용을 지울까요?')) return;
+  ['ps_name','ps_no','ps_dept','ps_rank'].forEach(f=>$(f).value='');
+  $('ps_loaded').style.display='none'; updateP();
+}
+
+const today=new Date().toISOString().slice(0,10), now=new Date();
+$('signDate').value=today; $('startDate').value=today;
+const ny=new Date(); ny.setFullYear(ny.getFullYear()+1); ny.setDate(ny.getDate()-1);
+$('endDate').value=ny.toISOString().slice(0,10);
+$('ps_ym').value=now.toISOString().slice(0,7);
+$('ps_payDate').value=new Date(now.getFullYear(),now.getMonth()+1,10).toISOString().slice(0,10);
+
+loadCompany(); updateC(); updateP();
+</script>
+</body>
+</html>
