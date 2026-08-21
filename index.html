@@ -138,6 +138,7 @@
     background:var(--accent);
   }
 
+  a.featured{ text-decoration:none; color:inherit; }
   .featured{
     position:relative;
     display:grid;
@@ -180,6 +181,15 @@
     color:var(--ink-dim);
   }
   .featured-meta b{ color:var(--ink); }
+  .featured-meta .go{
+    margin-left:auto; color:var(--accent); font-weight:700;
+    font-family:'Archivo',sans-serif; font-size:12px; letter-spacing:.03em;
+  }
+  a.featured:hover{ border-color:var(--accent); }
+  a.featured:hover .featured-main h2{ color:var(--accent); }
+  .featured-main h2{ transition: color .18s ease; }
+  .featured-tag{ transition: background .18s ease; }
+  a.featured:hover .featured-tag{ background:var(--accent); }
 
   .featured-visual{
     position:relative;
@@ -319,34 +329,42 @@
 </section>
 
 <div class="featured-wrap">
-  <div class="featured-label">다음에 걸릴 도구</div>
-  <div class="featured">
+  <div class="featured-label">지금 쓸 수 있는 도구</div>
+  <a class="featured" href="/nomu.html">
     <div class="featured-main">
-      <span class="featured-tag mono">HOOK-04 · NEXT UP</span>
-      <h2>마진 계산기</h2>
-      <p>원가, 수수료, 배송비를 넣으면 채널별 실제 마진율을 바로 계산합니다. 공구 유통 마진 구조에 맞춰 만드는 첫 실무 도구입니다.</p>
+      <span class="featured-tag mono">HOOK-01 · LIVE</span>
+      <h2>노무 관리 프로그램</h2>
+      <p>근로계약서와 임금명세서를 한 곳에서. 최저임금에 맞춘 급여 설계, 4대보험·소득세 자동 공제, 인쇄와 PDF까지 바로 됩니다.</p>
       <div class="featured-meta">
-        <span>진행률 <b>40%</b></span>
-        <span>예상 오픈 <b>이번 주</b></span>
+        <span>모듈 <b>2종</b></span>
+        <span>기준 <b>2026년 법령</b></span>
+        <span class="go">열기 →</span>
       </div>
     </div>
     <div class="featured-visual">
       <div class="spec-card">
-        <div class="row"><span>TYPE</span><b>계산기</b></div>
-        <div class="row"><span>INPUT</span><b>원가 · 수수료 · 배송비</b></div>
-        <div class="row"><span>OUTPUT</span><b>실 마진율 %</b></div>
-        <div class="row"><span>STATUS</span><b>제작중</b></div>
+        <div class="row"><span>01</span><b>근로계약서</b></div>
+        <div class="row"><span>02</span><b>임금명세서</b></div>
+        <div class="row"><span>최저시급</span><b>10,320원</b></div>
+        <div class="row"><span>STATUS</span><b>사용 가능</b></div>
       </div>
     </div>
-  </div>
+  </a>
 </div>
 
 <div class="compact-wrap" id="tools">
   <div class="compact-head">
-    <h3 class="mono">🧰 실무 도구 · 나머지</h3>
-    <span class="count">2개 대기중</span>
+    <h3 class="mono">🧰 실무 도구 · 준비중</h3>
+    <span class="count">3개 대기중</span>
   </div>
   <div class="row-list">
+    <div class="row-item">
+      <span class="peg-mini"></span>
+      <span class="no mono">HOOK-04</span>
+      <span class="name">마진 계산기</span>
+      <span class="desc">원가·수수료·배송비로 채널별 실마진 계산.</span>
+      <span class="status mono">빈 훅</span>
+    </div>
     <div class="row-item">
       <span class="peg-mini"></span>
       <span class="no mono">HOOK-05</span>
