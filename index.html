@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EASYWAYHUB — 필요한 걸, 걸어둡니다</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;900&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #F5F6F1;
+    --panel: #FFFFFF;
+    --panel-hole: #D9D6C9;
+    --stroke: #E1DED2;
+    --ink: #211D16;
+    --ink-dim: #756E5D;
+    --accent: #E85D0F;
+    --accent-soft: #FDE7D6;
+    --warn: #B8860B;
+  }
+
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  html{ scroll-behavior:smooth; }
+
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'Inter', -apple-system, 'Pretendard', sans-serif;
+    line-height:1.5;
+    overflow-x:hidden;
+  }
+
+  a{ color:inherit; text-decoration:none; }
+
+  .mono{
+    font-family:'IBM Plex Mono', monospace;
+    letter-spacing:0.02em;
+  }
+
+  /* ---------- pegboard texture ---------- */
+  .pegboard{
+    background-image: radial-gradient(circle, var(--panel-hole) 1.6px, transparent 1.7px);
+    background-size: 22px 22px;
+    background-color: var(--panel);
+  }
+
+  /* ---------- header ---------- */
+  header{
+    position:sticky; top:0; z-index:50;
+    display:flex; align-items:center; justify-content:space-between;
+    padding: 18px 32px;
+    background:rgba(245,246,241,0.88);
+    backdrop-filter: blur(6px);
+    border-bottom:1px solid var(--stroke);
+  }
+  .logo{
+    font-family:'Archivo', sans-serif;
+    font-weight:900;
+    font-size:18px;
+    letter-spacing:0.02em;
+    display:flex; align-items:center; gap:8px;
+  }
+  .logo .dot{
+    width:9px; height:9px; border-radius:50%;
+    background:var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-soft);
+  }
+  nav{ display:flex; gap:28px; font-size:14px; color:var(--ink-dim); }
+  nav a:hover{ color:var(--ink); }
+
+  /* ---------- hero ---------- */
+  .hero{
+    position:relative;
+    padding: 88px 32px 64px;
+    text-align:center;
+    background:var(--bg);
+    overflow:hidden;
+  }
+  .hero::before{
+    content:"";
+    position:absolute; inset:0;
+    background-image: radial-gradient(circle, #E4E1D4 1.3px, transparent 1.4px);
+    background-size: 26px 26px;
+    -webkit-mask-image: radial-gradient(ellipse 60% 55% at 50% 30%, black 0%, transparent 75%);
+            mask-image: radial-gradient(ellipse 60% 55% at 50% 30%, black 0%, transparent 75%);
+    opacity:1;
+  }
+  .eyebrow{
+    position:relative;
+    display:inline-flex; align-items:center; gap:10px;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12px; color:#9A5B00;
+    border:1px solid #F0C98A;
+    padding:6px 14px; border-radius:999px;
+    margin-bottom:26px;
+    background:var(--accent-soft);
+  }
+  .eyebrow .pulse{
+    width:6px;height:6px;border-radius:50%;
+    background:var(--warn);
+    animation: blink 1.8s infinite ease-in-out;
+  }
+  @keyframes blink{ 0%,100%{opacity:1;} 50%{opacity:0.25;} }
+
+  .hero h1{
+    position:relative;
+    font-family:'Archivo', sans-serif;
+    font-weight:900;
+    font-size:clamp(32px, 5.6vw, 58px);
+    line-height:1.1;
+    letter-spacing:-0.01em;
+    max-width:820px;
+    margin:0 auto 20px;
+    color:var(--ink);
+  }
+  .hero h1 span{ color:var(--accent); }
+
+  .hero p{
+    position:relative;
+    max-width:520px;
+    margin:0 auto;
+    color:var(--ink-dim);
+    font-size:16px;
+  }
+
+  /* ---------- featured tool (big, single) ---------- */
+  .featured-wrap{ padding: 8px 32px 0; max-width:1080px; margin:0 auto; }
+  .featured-label{
+    display:flex; align-items:center; gap:10px;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12px; color:var(--ink-dim);
+    margin-bottom:14px;
+  }
+  .featured-label::before{
+    content:"";
+    width:8px;height:8px;border-radius:50%;
+    background:var(--accent);
+  }
+
+  .featured{
+    position:relative;
+    display:grid;
+    grid-template-columns: 1.15fr 0.85fr;
+    gap:0;
+    border:1.5px solid var(--ink);
+    border-radius:14px;
+    overflow:hidden;
+    background:var(--panel);
+    box-shadow: 0 18px 40px rgba(33,29,22,0.08);
+  }
+  .featured-main{
+    padding: 44px 40px;
+    display:flex; flex-direction:column; justify-content:center;
+    gap:16px;
+  }
+  .featured-tag{
+    display:inline-flex; align-self:flex-start;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px;
+    background:var(--ink); color:#fff;
+    padding:5px 10px; border-radius:4px;
+  }
+  .featured-main h2{
+    font-family:'Archivo', sans-serif;
+    font-weight:900;
+    font-size:clamp(26px, 3.4vw, 38px);
+    line-height:1.15;
+  }
+  .featured-main p{
+    color:var(--ink-dim);
+    font-size:15px;
+    max-width:420px;
+  }
+  .featured-meta{
+    display:flex; gap:18px;
+    margin-top:6px;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px;
+    color:var(--ink-dim);
+  }
+  .featured-meta b{ color:var(--ink); }
+
+  .featured-visual{
+    position:relative;
+    background-image: radial-gradient(circle, var(--panel-hole) 1.6px, transparent 1.7px);
+    background-size: 20px 20px;
+    background-color:#FBFAF6;
+    border-left:1.5px solid var(--ink);
+    display:flex; align-items:center; justify-content:center;
+    padding:32px;
+    min-height:260px;
+  }
+  .spec-card{
+    background:var(--panel);
+    border:1px solid var(--stroke);
+    border-radius:10px;
+    padding:22px;
+    width:100%;
+    max-width:260px;
+    box-shadow: 0 8px 20px rgba(33,29,22,0.06);
+  }
+  .spec-card .row{
+    display:flex; justify-content:space-between;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11.5px;
+    padding:7px 0;
+    border-bottom:1px dashed var(--stroke);
+    color:var(--ink-dim);
+  }
+  .spec-card .row:last-child{ border-bottom:none; }
+  .spec-card .row b{ color:var(--ink); font-weight:600; }
+
+  /* ---------- compact sections below ---------- */
+  .compact-wrap{ padding: 56px 32px 20px; max-width:1080px; margin:0 auto; }
+  .compact-head{
+    display:flex; align-items:baseline; justify-content:space-between;
+    margin-bottom:14px;
+  }
+  .compact-head h3{
+    font-family:'Archivo', sans-serif;
+    font-weight:700;
+    font-size:15px;
+    color:var(--ink-dim);
+    text-transform:uppercase;
+    letter-spacing:0.04em;
+  }
+  .compact-head .count{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px; color:var(--ink-dim);
+  }
+
+  .row-list{
+    border-top:1px solid var(--stroke);
+    margin-bottom:36px;
+  }
+  .row-item{
+    display:flex; align-items:center; gap:16px;
+    padding:14px 4px;
+    border-bottom:1px solid var(--stroke);
+    transition: background 0.15s ease;
+  }
+  .row-item:hover{ background: #FBFAF5; }
+  .row-item .peg-mini{
+    width:7px;height:7px;border-radius:50%;
+    background:var(--bg);
+    box-shadow: inset 0 0 0 1.3px var(--stroke);
+    flex-shrink:0;
+  }
+  .row-item .no{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:10.5px; color:#B4AE9E;
+    width:56px; flex-shrink:0;
+  }
+  .row-item .name{
+    font-family:'Archivo', sans-serif;
+    font-weight:700;
+    font-size:14.5px;
+    flex-shrink:0;
+    width:150px;
+  }
+  .row-item .desc{
+    color:var(--ink-dim);
+    font-size:13px;
+    flex:1;
+  }
+  .row-item .status{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:10.5px;
+    color:#A39C8C;
+    white-space:nowrap;
+  }
+  .row-item .status::before{ content:"○ "; }
+
+  /* ---------- footer ---------- */
+  footer{
+    padding: 40px 32px 48px;
+    text-align:center;
+    color:var(--ink-dim);
+    font-size:12px;
+    border-top:1px solid var(--stroke);
+    margin-top:20px;
+  }
+  footer .mono{ color:#9A9484; }
+
+  @media (max-width: 760px){
+    .featured{ grid-template-columns: 1fr; }
+    .featured-visual{ border-left:none; border-top:1.5px solid var(--ink); }
+    nav{ display:none; }
+    header{ padding:16px 20px; }
+    .hero{ padding:64px 20px 48px; }
+    .featured-wrap{ padding:8px 20px 0; }
+    .compact-wrap{ padding:44px 20px 10px; }
+    .row-item{ flex-wrap:wrap; }
+    .row-item .name{ width:auto; }
+    .row-item .desc{ width:100%; order:3; }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ animation:none !important; transition:none !important; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo"><span class="dot"></span>EASYWAYHUB</div>
+  <nav>
+    <a href="#games">모임·게임</a>
+    <a href="#tools">도구</a>
+    <a href="#info">정보</a>
+  </nav>
+</header>
+
+<section class="hero">
+  <div class="eyebrow"><span class="pulse"></span> STATUS · 공사중 · 훅이 하나씩 채워지고 있습니다</div>
+  <h1>필요한 걸 <span>만들어서</span><br>여기에 걸어둡니다</h1>
+  <p>공구를 페그보드에 걸어두듯, 쓸모 있는 웹 도구와 정보를 하나씩 만들어 이 자리에 걸어둡니다.</p>
+</section>
+
+<div class="featured-wrap">
+  <div class="featured-label">다음에 걸릴 도구</div>
+  <div class="featured">
+    <div class="featured-main">
+      <span class="featured-tag mono">HOOK-04 · NEXT UP</span>
+      <h2>마진 계산기</h2>
+      <p>원가, 수수료, 배송비를 넣으면 채널별 실제 마진율을 바로 계산합니다. 공구 유통 마진 구조에 맞춰 만드는 첫 실무 도구입니다.</p>
+      <div class="featured-meta">
+        <span>진행률 <b>40%</b></span>
+        <span>예상 오픈 <b>이번 주</b></span>
+      </div>
+    </div>
+    <div class="featured-visual">
+      <div class="spec-card">
+        <div class="row"><span>TYPE</span><b>계산기</b></div>
+        <div class="row"><span>INPUT</span><b>원가 · 수수료 · 배송비</b></div>
+        <div class="row"><span>OUTPUT</span><b>실 마진율 %</b></div>
+        <div class="row"><span>STATUS</span><b>제작중</b></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="compact-wrap" id="tools">
+  <div class="compact-head">
+    <h3 class="mono">🧰 실무 도구 · 나머지</h3>
+    <span class="count">2개 대기중</span>
+  </div>
+  <div class="row-list">
+    <div class="row-item">
+      <span class="peg-mini"></span>
+      <span class="no mono">HOOK-05</span>
+      <span class="name">순위 추적기</span>
+      <span class="desc">네이버 쇼핑 키워드 순위를 한눈에 확인.</span>
+      <span class="status mono">빈 훅</span>
+    </div>
+    <div class="row-item">
+      <span class="peg-mini"></span>
+      <span class="no mono">HOOK-06</span>
+      <span class="name">사업자 조회</span>
+      <span class="desc">거래처 사업자등록 상태를 빠르게 확인.</span>
+      <span class="status mono">빈 훅</span>
+    </div>
+  </div>
+
+  <div class="compact-head" id="games">
+    <h3 class="mono">🎉 모임 · 게임</h3>
+    <span class="count">3개 대기중</span>
+  </div>
+  <div class="row-list">
+    <div class="row-item">
+      <span class="peg-mini"></span>
+      <span class="no mono">HOOK-01</span>
+      <span class="name">추첨 · 뽑기</span>
+      <span class="desc">모임 자리 정하기, 당번 뽑기 같은 랜덤 추첨 도구.</span>
+      <span class="status mono">빈 훅</span>
+    </div>
+    <div class="row-item">
+      <span class="peg-mini"></span>
+      <span class="no mono">HOOK-02</span>
+      <span class="name">아이스브레이킹</span>
+      <span class="desc">회식·워크숍 시작할 때 쓰는 짧은 질문 카드.</span>
+      <span class="status mono">빈 훅</span>
+    </div>
+    <div class="row-item">
+      <span class="peg-mini"></span>
+      <span class="no mono">HOOK-03</span>
+      <span class="name">타이머 · 룰렛</span>
+      <span class="desc">발표 시간, 게임 순서 정할 때 쓰는 도구.</span>
+      <span class="status mono">빈 훅</span>
+    </div>
+  </div>
+
+  <div class="compact-head" id="info">
+    <h3 class="mono">📚 정보 · 인사이트</h3>
+    <span class="count">3개 대기중</span>
+  </div>
+  <div class="row-list">
+    <div class="row-item">
+      <span class="peg-mini"></span>
+      <span class="no mono">HOOK-07</span>
+      <span class="name">공구 브랜드 가이드</span>
+      <span class="desc">주요 브랜드별 특징과 라인업 정리.</span>
+      <span class="status mono">빈 훅</span>
+    </div>
+    <div class="row-item">
+      <span class="peg-mini"></span>
+      <span class="no mono">HOOK-08</span>
+      <span class="name">유통 팁</span>
+      <span class="desc">이커머스 채널 운영에서 얻은 노하우 모음.</span>
+      <span class="status mono">빈 훅</span>
+    </div>
+    <div class="row-item">
+      <span class="peg-mini"></span>
+      <span class="no mono">HOOK-09</span>
+      <span class="name">용어 사전</span>
+      <span class="desc">헷갈리는 유통·물류 용어를 짧게 정리.</span>
+      <span class="status mono">빈 훅</span>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="mono">EASYWAYHUB · easywayhub.com</div>
+  <div style="margin-top:6px;">필요한 걸, 만들어서 걸어둡니다.</div>
+</footer>
+
+</body>
+</html>
